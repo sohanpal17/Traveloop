@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
+import CreateTrip from './components/CreateTrip/CreateTrip';
 import './App.css';
 
 // Protected Route Component
@@ -31,6 +32,16 @@ const Dashboard = () => {
       <h1>Welcome to Traveloop Dashboard!</h1>
       <p>Hello, {userData?.displayName || 'Traveler'}!</p>
       <p>Your dashboard will be implemented in the next phase.</p>
+      <div style={{ marginTop: '20px' }}>
+        <a href="/create-trip" style={{
+          padding: '10px 20px', 
+          background: '#2E3773', 
+          color: 'white', 
+          textDecoration: 'none', 
+          borderRadius: '8px',
+          display: 'inline-block'
+        }}>Create New Trip</a>
+      </div>
     </div>
   );
 };
@@ -48,6 +59,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/create-trip" 
+              element={
+                <ProtectedRoute>
+                  <CreateTrip />
                 </ProtectedRoute>
               } 
             />

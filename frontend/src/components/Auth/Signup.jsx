@@ -61,7 +61,7 @@ const Signup = () => {
         formData.displayName
       );
       toast.success('Account created successfully!');
-      navigate('/dashboard');
+      navigate('/create-trip');
     } catch (error) {
       console.error('Signup error:', error);
       
@@ -86,7 +86,7 @@ const Signup = () => {
     try {
       await authService.loginWithGoogle();
       toast.success('Account created successfully!');
-      navigate('/dashboard');
+      navigate('/create-trip');
     } catch (error) {
       console.error('Google signup error:', error);
       toast.error('Google signup failed. Please try again.');

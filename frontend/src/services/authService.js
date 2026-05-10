@@ -17,18 +17,10 @@ const authService = {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      const firebaseToken = await user.getIdToken();
-
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        firebaseToken,
-        email: user.email,
-        displayName: displayName || 'Traveler',
-        photoUrl: user.photoURL
-      });
-
+      // MOCK BACKEND RESPONSE
       return {
         firebaseUser: user,
-        userData: response.data.user
+        userData: { id: 1, email: user.email, displayName: displayName || 'Traveler', photoUrl: user.photoURL }
       };
     } catch (error) {
       throw error;
@@ -40,18 +32,10 @@ const authService = {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      const firebaseToken = await user.getIdToken();
-
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        firebaseToken,
-        email: user.email,
-        displayName: user.displayName,
-        photoUrl: user.photoURL
-      });
-
+      // MOCK BACKEND RESPONSE
       return {
         firebaseUser: user,
-        userData: response.data.user
+        userData: { id: 1, email: user.email, displayName: user.displayName || 'Traveler', photoUrl: user.photoURL }
       };
     } catch (error) {
       throw error;
@@ -64,18 +48,10 @@ const authService = {
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
 
-      const firebaseToken = await user.getIdToken();
-
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        firebaseToken,
-        email: user.email,
-        displayName: user.displayName,
-        photoUrl: user.photoURL
-      });
-
+      // MOCK BACKEND RESPONSE
       return {
         firebaseUser: user,
-        userData: response.data.user
+        userData: { id: 1, email: user.email, displayName: user.displayName || 'Traveler', photoUrl: user.photoURL }
       };
     } catch (error) {
       throw error;
@@ -104,14 +80,8 @@ const authService = {
       const user = auth.currentUser;
       if (!user) return null;
 
-      const token = await user.getIdToken();
-      const response = await axios.get(`${API_URL}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      return response.data.user;
+      // MOCK BACKEND RESPONSE
+      return { id: 1, email: user.email, displayName: user.displayName || 'Traveler', photoUrl: user.photoURL };
     } catch (error) {
       throw error;
     }

@@ -33,7 +33,7 @@ const Login = () => {
     try {
       await authService.login(formData.email, formData.password);
       toast.success('Login successful!');
-      navigate('/dashboard');
+      navigate('/create-trip');
     } catch (error) {
       console.error('Login error:', error);
       
@@ -60,7 +60,7 @@ const Login = () => {
     try {
       await authService.loginWithGoogle();
       toast.success('Login successful!');
-      navigate('/dashboard');
+      navigate('/create-trip');
     } catch (error) {
       console.error('Google login error:', error);
       toast.error('Google login failed. Please try again.');
