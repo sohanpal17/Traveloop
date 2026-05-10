@@ -3,6 +3,8 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/authService';
+import CommunityTab from '../Community/CommunityTab';
+import CitySearch from '../CitySearch/CitySearch';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -15,18 +17,9 @@ const Dashboard = () => {
   const [filterBy, setFilterBy] = useState('All');
   const [sortBy, setSortBy] = useState('Recommended');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [profileSaving, setProfileSaving] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    firstName: '',
-    lastName: '',
-    displayName: '',
-    phoneNumber: '',
-    city: '',
-    country: '',
-    additionalInfo: '',
-    photoUrl: ''
-  });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState('destinations'); // destinations, community, shared
+  
 
   useEffect(() => {
     const handleDocumentClick = (event) => {
@@ -39,20 +32,7 @@ const Dashboard = () => {
     return () => document.removeEventListener('mousedown', handleDocumentClick);
   }, []);
 
-  useEffect(() => {
-    if (userData) {
-      setProfileForm({
-        firstName: userData.firstName || '',
-        lastName: userData.lastName || '',
-        displayName: userData.displayName || '',
-        phoneNumber: userData.phoneNumber || '',
-        city: userData.city || '',
-        country: userData.country || '',
-        additionalInfo: userData.additionalInfo || '',
-        photoUrl: userData.photoUrl || ''
-      });
-    }
-  }, [userData]);
+  // profile modal and inline edit removed — profile is view-only from Dashboard menu
 
   const regionalSelections = [
     {
@@ -111,6 +91,31 @@ const Dashboard = () => {
     }
   ];
 
+  // Shared Itineraries from community
+  const sharedItineraries = [
+    {
+      id: 1,
+      title: 'Amazing Thailand Adventure',
+      author: 'Sarah Chen',
+      image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=900&q=80',
+      likes: 234
+    },
+    {
+      id: 2,
+      title: 'Swiss Alps Hiking Guide',
+      author: 'John Alpine',
+      image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=900&q=80',
+      likes: 189
+    },
+    {
+      id: 3,
+      title: 'Japan in 2 Weeks',
+      author: 'Maya Travelers',
+      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=900&q=80',
+      likes: 456
+    }
+  ];
+
   const filteredRegionalSelections = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -141,10 +146,81 @@ const Dashboard = () => {
     <div className="dashboard-shell">
       <div className="dashboard-background"></div>
 
+      {/* Sidebar Navigation */}
+      <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+        <div className="sidebar-header">
+          <div className="brand-row">
+            <span className="brand-mark"></span>
+            <span className="brand-name">Traveloop</span>
+          </div>
+          <button 
+            className="sidebar-toggle"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            ≡
+          </button>
+        </div>
+
+        <nav className="sidebar-menu">
+          <button 
+            className={`sidebar-item ${activeTab === 'destinations' ? 'active' : ''}`}
+            onClick={() => setActiveTab('destinations')}
+          >
+            🏠 Dashboard
+          </button>
+          <button 
+            className="sidebar-item"
+            onClick={() => { navigate('/trips'); setIsSidebarOpen(false); }}
+          >
+            ✈️ My Trips
+          </button>
+          <button 
+            className="sidebar-item"
+            onClick={() => { navigate('/profile'); setIsSidebarOpen(false); }}
+          >
+            👤 Profile
+          </button>
+          <button 
+            className={`sidebar-item ${activeTab === 'community' ? 'active' : ''}`}
+            onClick={() => setActiveTab('community')}
+          >
+            🌍 Community
+          </button>
+          <button 
+            className={`sidebar-item ${activeTab === 'city-search' ? 'active' : ''}`}
+            onClick={() => setActiveTab('city-search')}
+          >
+            🔍 City Search
+          </button>
+          <button 
+            className="sidebar-item"
+            onClick={() => { navigate('/create-trip'); setIsSidebarOpen(false); }}
+          >
+            ➕ Create Trip
+          </button>
+        </nav>
+
+        <div className="sidebar-footer">
+          <button
+            type="button"
+            className="sidebar-item danger"
+            onClick={async () => {
+              setIsSidebarOpen(false);
+              await authService.logout();
+              setUserData(null);
+              toast.success('Logged out successfully');
+              navigate('/login');
+            }}
+          >
+            🚪 Logout
+          </button>
+        </div>
+      </aside>
+
       <div className="dashboard-card">
         <header className="dashboard-topbar">
           <div>
-            <div className="brand-row">
+            <div className="brand-row" onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ cursor: 'pointer' }}>
               <span className="brand-mark"></span>
               <span className="brand-name">Traveloop</span>
             </div>
@@ -165,11 +241,11 @@ const Dashboard = () => {
                   type="button"
                   className="profile-menu-item"
                   onClick={() => {
-                    setIsProfileModalOpen(true);
+                    navigate('/profile');
                     setIsProfileMenuOpen(false);
                   }}
                 >
-                  Edit Profile
+                  View Profile
                 </button>
                 <button
                   type="button"
@@ -189,214 +265,141 @@ const Dashboard = () => {
           </div>
         </header>
 
-        <section className="hero-banner">
-          <div className="hero-banner__overlay"></div>
-          <div className="hero-banner__content">
-            <p className="hero-label">Welcome back</p>
-            <h1>{userData?.displayName ? `Plan your next trip, ${userData.displayName}` : 'Plan your next trip'}</h1>
-            <p>Search destinations, compare ideas, and pick up where you left off.</p>
-          </div>
-        </section>
+        {/* Content Tabs */}
+        {activeTab === 'destinations' && (
+          <>
+            <section className="hero-banner">
+              <div className="hero-banner__overlay"></div>
+              <div className="hero-banner__content">
+                <p className="hero-label">Welcome back</p>
+                <h1>{userData?.displayName ? `Plan your next trip, ${userData.displayName}` : 'Plan your next trip'}</h1>
+                <p>Search destinations, compare ideas, and pick up where you left off.</p>
+              </div>
+            </section>
 
-        <div className="dashboard-toolbar">
-          <label className="search-input" aria-label="Search">
-            <span className="search-icon" aria-hidden="true">🔍</span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search trips or destinations"
-            />
-          </label>
+            <div className="dashboard-toolbar">
+              <label className="search-input" aria-label="Search">
+                <span className="search-icon" aria-hidden="true">🔍</span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search trips or destinations"
+                />
+              </label>
 
-          <select value={groupBy} onChange={(event) => setGroupBy(event.target.value)} className="toolbar-select">
-            <option value="Region">Group by</option>
-            <option value="Region">Region</option>
-            <option value="Season">Season</option>
-            <option value="Type">Type</option>
-          </select>
+              <select value={groupBy} onChange={(event) => setGroupBy(event.target.value)} className="toolbar-select">
+                <option value="Region">Group by</option>
+                <option value="Region">Region</option>
+                <option value="Season">Season</option>
+                <option value="Type">Type</option>
+              </select>
 
-          <select value={filterBy} onChange={(event) => setFilterBy(event.target.value)} className="toolbar-select">
-            <option value="All">Filter</option>
-            <option value="All">All</option>
-            <option value="Europe">Europe</option>
-            <option value="Asia">Asia</option>
-            <option value="Oceania">Oceania</option>
-            <option value="France">France</option>
-            <option value="Japan">Japan</option>
-          </select>
+              <select value={filterBy} onChange={(event) => setFilterBy(event.target.value)} className="toolbar-select">
+                <option value="All">Filter</option>
+                <option value="All">All</option>
+                <option value="Europe">Europe</option>
+                <option value="Asia">Asia</option>
+                <option value="Oceania">Oceania</option>
+                <option value="France">France</option>
+                <option value="Japan">Japan</option>
+              </select>
 
-          <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="toolbar-select">
-            <option value="Recommended">Sort by...</option>
-            <option value="Recommended">Recommended</option>
-            <option value="Newest">Newest</option>
-          </select>
-        </div>
+              <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="toolbar-select">
+                <option value="Recommended">Sort by...</option>
+                <option value="Recommended">Recommended</option>
+                <option value="Newest">Newest</option>
+              </select>
+            </div>
 
-        <section className="section-block">
-          <div className="section-heading">
-            <h2>Top Regional Selections</h2>
-            <span></span>
-          </div>
+            <section className="section-block">
+              <div className="section-heading">
+                <h2>Top Regional Selections</h2>
+                <span></span>
+              </div>
 
-          <div className="regional-grid">
-            {filteredRegionalSelections.map((place) => (
-              <button
-                key={place.id}
-                className="regional-card"
-                style={{ backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.52)), url(${place.image})` }}
-                onClick={() => navigate('/trips')}
-              >
-                <span className="regional-card__name">{place.label}</span>
-                <span className="regional-card__sub">{place.name}</span>
-              </button>
-            ))}
-          </div>
-        </section>
+              <div className="regional-grid">
+                {filteredRegionalSelections.map((place) => (
+                  <button
+                    key={place.id}
+                    className="regional-card"
+                    style={{ backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.52)), url(${place.image})` }}
+                    onClick={() => navigate('/city-search')}
+                  >
+                    <span className="regional-card__name">{place.label}</span>
+                    <span className="regional-card__sub">{place.name}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-        <section className="section-block section-block--spacious">
-          <div className="section-heading">
-            <h2>Previous Trips</h2>
-            <span></span>
-          </div>
+            <section className="section-block section-block--spacious">
+              <div className="section-heading">
+                <h2>Previous Trips</h2>
+                <span></span>
+              </div>
 
-          <div className="trips-row">
-            {filteredTrips.map((trip) => (
-              <article key={trip.id} className="previous-trip-card" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.55)), url(${trip.image})` }}>
-                <div className="previous-trip-card__content">
-                  <span>{trip.region}</span>
-                  <h3>{trip.title}</h3>
-                  <p>{trip.dates}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+              <div className="trips-row">
+                {filteredTrips.map((trip) => (
+                  <article key={trip.id} className="previous-trip-card" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.55)), url(${trip.image})` }}>
+                    <div className="previous-trip-card__content">
+                      <span>{trip.region}</span>
+                      <h3>{trip.title}</h3>
+                      <p>{trip.dates}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {/* Shared Itineraries Tab */}
+        {activeTab === 'shared' && (
+          <section className="section-block section-block--spacious">
+            <div className="section-heading">
+              <h2>Public Itineraries from Community</h2>
+              <p className="section-subtext">Copy ideas from these public trips</p>
+            </div>
+
+            <div className="trips-row">
+              {sharedItineraries.map((itinerary) => (
+                <article key={itinerary.id} className="previous-trip-card" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.55)), url(${itinerary.image})` }}>
+                  <div className="previous-trip-card__content">
+                    <span>By {itinerary.author}</span>
+                    <h3>{itinerary.title}</h3>
+                    <p>❤️ {itinerary.likes} likes</p>
+                    <button 
+                      className="copy-btn"
+                      onClick={() => {
+                        toast.info('Trip copied! View in your trips');
+                        navigate('/trips');
+                      }}
+                    >
+                      Copy Trip
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Community Tab */}
+        {activeTab === 'community' && (
+          <CommunityTab />
+        )}
+
+        {/* City Search Tab */}
+        {activeTab === 'city-search' && (
+          <CitySearch />
+        )}
 
         <button className="plan-fab" onClick={() => navigate('/create-trip')}>
           <span>+</span> Plan a trip
         </button>
 
-        {isProfileModalOpen && (
-          <div className="profile-modal-backdrop" onClick={() => setIsProfileModalOpen(false)}>
-            <div className="profile-modal" onClick={(event) => event.stopPropagation()}>
-              <div className="profile-modal__header">
-                <div>
-                  <h2>Edit Profile</h2>
-                  <p>Update your travel profile details.</p>
-                </div>
-                <button type="button" className="profile-modal__close" onClick={() => setIsProfileModalOpen(false)}>
-                  ×
-                </button>
-              </div>
-
-              <div className="profile-modal__avatar">
-                <div className="profile-modal__circle">
-                  {profileForm.photoUrl ? (
-                    <img src={profileForm.photoUrl} alt="Profile" />
-                  ) : (
-                    <span>{(profileForm.displayName || userData?.displayName || 'T').slice(0, 1).toUpperCase()}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="profile-form-grid">
-                <label>
-                  First Name
-                  <input
-                    type="text"
-                    value={profileForm.firstName}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, firstName: event.target.value }))}
-                  />
-                </label>
-                <label>
-                  Last Name
-                  <input
-                    type="text"
-                    value={profileForm.lastName}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, lastName: event.target.value }))}
-                  />
-                </label>
-                <label className="profile-form-grid__full">
-                  Display Name
-                  <input
-                    type="text"
-                    value={profileForm.displayName}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, displayName: event.target.value }))}
-                  />
-                </label>
-                <label>
-                  Phone Number
-                  <input
-                    type="tel"
-                    value={profileForm.phoneNumber}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, phoneNumber: event.target.value }))}
-                  />
-                </label>
-                <label>
-                  City
-                  <input
-                    type="text"
-                    value={profileForm.city}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, city: event.target.value }))}
-                  />
-                </label>
-                <label>
-                  Country
-                  <input
-                    type="text"
-                    value={profileForm.country}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, country: event.target.value }))}
-                  />
-                </label>
-                <label className="profile-form-grid__full">
-                  Additional Information
-                  <textarea
-                    rows="4"
-                    value={profileForm.additionalInfo}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, additionalInfo: event.target.value }))}
-                  />
-                </label>
-                <label className="profile-form-grid__full">
-                  Photo URL
-                  <input
-                    type="url"
-                    value={profileForm.photoUrl}
-                    onChange={(event) => setProfileForm((previous) => ({ ...previous, photoUrl: event.target.value }))}
-                  />
-                </label>
-              </div>
-
-              <div className="profile-modal__actions">
-                <button type="button" className="profile-action profile-action--ghost" onClick={() => setIsProfileModalOpen(false)}>
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="profile-action"
-                  disabled={profileSaving}
-                  onClick={async () => {
-                    setProfileSaving(true);
-                    try {
-                      const updatedUser = await authService.updateProfile(profileForm);
-                      setUserData(updatedUser);
-                      localStorage.setItem('user', JSON.stringify(updatedUser));
-                      toast.success('Profile updated successfully');
-                      setIsProfileModalOpen(false);
-                    } catch (error) {
-                      console.error('Profile update error:', error);
-                      toast.error('Failed to update profile');
-                    } finally {
-                      setProfileSaving(false);
-                    }
-                  }}
-                >
-                  {profileSaving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        
       </div>
     </div>
   );

@@ -115,7 +115,7 @@ const ItineraryView = () => {
 
                     {/* Expense Card */}
                     <div className="expense-card">
-                      <h3>${activity.estimated_cost}</h3>
+                      <h3>₹{activity.estimated_cost.toLocaleString('en-IN')}</h3>
                     </div>
 
                   </div>

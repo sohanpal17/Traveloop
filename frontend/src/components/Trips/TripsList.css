@@ -42,6 +42,27 @@
   margin-bottom: 24px;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-link {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2E3773;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.topbar-link:hover {
+  color: #7DD5E8;
+}
+
+
 .brand-row {
   display: flex;
   align-items: center;

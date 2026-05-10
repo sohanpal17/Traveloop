@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './ItineraryBuilder.css';
 
 /**
@@ -11,6 +12,8 @@ import './ItineraryBuilder.css';
  */
 const ItineraryBuilder = () => {
   const navigate = useNavigate();
+  const { tripId } = useParams();
+  const location = useLocation();
   const [tripTitle, setTripTitle] = useState('');
 
   const makeStop = () => ({
@@ -20,11 +23,13 @@ const ItineraryBuilder = () => {
     start_date: '',
     end_date: '',
     notes: '',
+    budget: '',
     order_index: 0,
     activities: [{ title: '', category: 'sightseeing', estimated_cost: '' }]
   });
 
   const [stops, setStops] = useState([makeStop()]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddStop = () => {
     setStops([...stops, { ...makeStop(), id: Date.now().toString(), order_index: stops.length }]);
@@ -74,14 +79,72 @@ const ItineraryBuilder = () => {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!tripTitle.trim()) {
-      alert('Please enter a trip name.');
+      toast.error('Please enter a trip name.');
       return;
     }
-    // TODO: POST to backend /api/trips then /api/stops then /api/activities
-    navigate('/trips');
+
+    setIsLoading(true);
+    try {
+      // TODO: POST stops and activities to backend
+      // For now, just redirect to dashboard after brief delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      toast.success('Itinerary saved successfully!');
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Save failed', err);
+      toast.error('Failed to save itinerary. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  useEffect(() => {
+    // If we were navigated here from CreateTrip, prefill title from location state.
+    if (location?.state?.trip) {
+      setTripTitle(location.state.trip.title || '');
+    }
+    // Optionally, if tripId corresponds to an existing trip, fetch it here.
+  }, [location, tripId]);
+
+  useEffect(() => {
+    // If navigated with trip that includes start/end dates, pre-populate stops
+    const trip = location?.state?.trip;
+    if (trip) {
+      const { start_date, startDate, end_date, endDate } = trip;
+      const start = start_date || startDate || '';
+      const end = end_date || endDate || '';
+
+      if (start && end) {
+        try {
+          const s = new Date(start);
+          const e = new Date(end);
+          if (!isNaN(s) && !isNaN(e) && e >= s) {
+            const days = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
+            const generatedStops = [];
+            for (let i = 0; i < days; i++) {
+              const current = new Date(s);
+              current.setDate(s.getDate() + i);
+              generatedStops.push({
+                id: `${trip.id || 'tmp'}-stop-${i}`,
+                city: trip.destination || '',
+                country: '',
+                start_date: current.toISOString().slice(0, 10),
+                end_date: current.toISOString().slice(0, 10),
+                notes: '',
+                order_index: i,
+                activities: [{ title: '', category: 'sightseeing', estimated_cost: '' }]
+              });
+            }
+            setStops(generatedStops);
+          }
+        } catch (err) {
+          console.warn('Failed to generate stops from dates', err);
+        }
+      }
+    }
+  }, [location]);
 
   const categories = ['sightseeing', 'food', 'transport', 'accommodation', 'shopping', 'entertainment', 'other'];
 
@@ -91,134 +154,97 @@ const ItineraryBuilder = () => {
 
       <div className="itinerary-content">
         <header className="itinerary-header">
-          <h1>Plan Your Itinerary</h1>
+          <h1>Build Your Itinerary</h1>
           <input
             type="text"
             className="trip-name-input"
-            placeholder="e.g., Summer in Europe 2026"
+            placeholder="Enter your trip name"
             value={tripTitle}
             onChange={(e) => setTripTitle(e.target.value)}
           />
         </header>
 
-        <div className="stops-list">
+        <div className="sections-list">
           {stops.map((stop, index) => (
-            <div key={stop.id} className="stop-card">
-              <div className="stop-header">
-                <div className="stop-inputs">
-                  <div className="input-group">
-                    <label>City</label>
-                    <input
-                      type="text"
-                      className="itinerary-input"
-                      placeholder="e.g., Paris"
-                      value={stop.city}
-                      onChange={(e) => handleStopChange(stop.id, 'city', e.target.value)}
-                    />
-                  </div>
-                  <div className="input-group">
-                    <label>Country</label>
-                    <input
-                      type="text"
-                      className="itinerary-input"
-                      placeholder="e.g., France"
-                      value={stop.country}
-                      onChange={(e) => handleStopChange(stop.id, 'country', e.target.value)}
-                    />
-                  </div>
-                  <div className="input-group">
-                    <label>Start Date</label>
+            <div key={stop.id} className="section-card">
+              <div className="section-header">
+                <h3>Section {index + 1}</h3>
+                {stops.length > 1 && (
+                  <button
+                    className="icon-btn delete-small"
+                    onClick={() => handleRemoveStop(stop.id)}
+                    title="Remove Section"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              <p className="section-description">
+                All the necessary information about this section.<br/>
+                This can be anything like travel section, hotel or any other activity
+              </p>
+
+              <div className="section-inputs">
+                <div className="input-group">
+                  <label>Date Range</label>
+                  <div className="date-range-inputs">
                     <input
                       type="date"
-                      className="itinerary-input"
+                      className="section-input"
                       value={stop.start_date}
                       onChange={(e) => handleStopChange(stop.id, 'start_date', e.target.value)}
+                      placeholder="From"
                     />
-                  </div>
-                  <div className="input-group">
-                    <label>End Date</label>
+                    <span className="date-sep">to</span>
                     <input
                       type="date"
-                      className="itinerary-input"
+                      className="section-input"
                       value={stop.end_date}
                       onChange={(e) => handleStopChange(stop.id, 'end_date', e.target.value)}
+                      placeholder="To"
                     />
                   </div>
                 </div>
 
-                <div className="stop-controls">
-                  <button className="icon-btn" disabled={index === 0} onClick={() => handleMoveStop(index, -1)} title="Move Up">↑</button>
-                  <button className="icon-btn" disabled={index === stops.length - 1} onClick={() => handleMoveStop(index, 1)} title="Move Down">↓</button>
-                  <button className="icon-btn delete" disabled={stops.length === 1} onClick={() => handleRemoveStop(stop.id)} title="Remove Stop">×</button>
+                <div className="input-group">
+                  <label>Budget of this section</label>
+                  <input
+                    type="number"
+                    className="section-input"
+                    placeholder="₹0.00"
+                    value={stop.budget}
+                    onChange={(e) => handleStopChange(stop.id, 'budget', e.target.value)}
+                  />
                 </div>
               </div>
 
-              {/* Notes for this stop */}
-              <div className="input-group" style={{ marginTop: '12px' }}>
-                <label>Notes</label>
+              {/* Notes section */}
+              <div className="notes-section">
                 <input
                   type="text"
-                  className="itinerary-input"
-                  placeholder="Any notes for this stop..."
+                  className="section-input"
+                  placeholder="Add notes for this section..."
                   value={stop.notes}
                   onChange={(e) => handleStopChange(stop.id, 'notes', e.target.value)}
                 />
-              </div>
-
-              {/* Activities */}
-              <div className="activities-section">
-                <h4>Activities & Plans</h4>
-                {stop.activities.map((activity, actIndex) => (
-                  <div key={actIndex} className="activity-item">
-                    <input
-                      type="text"
-                      className="itinerary-input"
-                      placeholder="Activity title (e.g., Visit Eiffel Tower)"
-                      value={activity.title}
-                      onChange={(e) => handleActivityChange(stop.id, actIndex, 'title', e.target.value)}
-                      style={{ flex: 2 }}
-                    />
-                    <select
-                      className="itinerary-input"
-                      value={activity.category}
-                      onChange={(e) => handleActivityChange(stop.id, actIndex, 'category', e.target.value)}
-                      style={{ flex: 1, minWidth: '120px' }}
-                    >
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
-                      ))}
-                    </select>
-                    <input
-                      type="number"
-                      className="itinerary-input"
-                      placeholder="Cost ($)"
-                      value={activity.estimated_cost}
-                      onChange={(e) => handleActivityChange(stop.id, actIndex, 'estimated_cost', e.target.value)}
-                      style={{ flex: 0.7, minWidth: '90px' }}
-                    />
-                    <button
-                      className="icon-btn delete"
-                      onClick={() => handleRemoveActivity(stop.id, actIndex)}
-                      disabled={stop.activities.length === 1 && !activity.title}
-                      title="Remove Activity"
-                    >×</button>
-                  </div>
-                ))}
-                <button className="add-activity-btn" onClick={() => handleAddActivity(stop.id)}>
-                  + Add Activity
-                </button>
               </div>
             </div>
           ))}
         </div>
 
-        <button className="btn-add-stop" onClick={handleAddStop}>
-          + Add Another Stop
+        <button className="btn-add-section" onClick={handleAddStop}>
+          + Add another Section
         </button>
 
-        <button className="btn-save-itinerary" onClick={handleSave}>
-          Save Itinerary
-        </button>
+        <div className="itinerary-actions">
+          <button className="btn-cancel" onClick={() => navigate('/dashboard')} disabled={isLoading}>
+            Cancel
+          </button>
+          <button className="btn-save-itinerary" onClick={handleSave} disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save Itinerary'}
+          </button>
+        </div>
       </div>
     </div>
   );

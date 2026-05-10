@@ -7,8 +7,17 @@ import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import Dashboard from './components/Dashboard/Dashboard';
 import TripsList from './components/Trips/TripsList';
-import CreateTrip from './components/Trips/CreateTrip';
+import TripDetails from './components/Trips/TripDetails';
+import CreateTrip from './components/CreateTrip/CreateTrip';
 import ItineraryBuilder from './components/Trips/ItineraryBuilder';
+import ItineraryView from './components/Trips/ItineraryView';
+import PackingChecklist from './components/Trips/PackingChecklist';
+import SharedItinerary from './components/Trips/SharedItinerary';
+import TripNotes from './components/Trips/TripNotes';
+import ExpenseInvoice from './components/Trips/ExpenseInvoice';
+import CommunityTab from './components/Community/CommunityTab';
+import CitySearch from './components/CitySearch/CitySearch';
+import UserProfile from './components/Profile/UserProfile';
 import './App.css';
 
 // Protected Route Component
@@ -54,19 +63,79 @@ function App() {
               path="/create-trip"
               element={
                 <ProtectedRoute>
-                  <CreateTrip />
+                  <TripDetails />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/plan"
+              path="/plan/:tripId"
               element={
                 <ProtectedRoute>
                   <ItineraryBuilder />
                 </ProtectedRoute>
               }
             />
-            <Route path="/" element={<Navigate to="/login" />} />
+            <Route
+              path="/trips/:tripId"
+              element={
+                <ProtectedRoute>
+                  <ItineraryView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/packing/:tripId"
+              element={
+                <ProtectedRoute>
+                  <PackingChecklist />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                <ProtectedRoute>
+                  <CommunityTab />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/city-search"
+              element={
+                <ProtectedRoute>
+                  <CitySearch />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tripnotes"
+              element={
+                <ProtectedRoute>
+                  <TripNotes />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/expenses"
+              element={
+                <ProtectedRoute>
+                  <ExpenseInvoice />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/shared/:slug"
+              element={<SharedItinerary />}
+            />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
           <ToastContainer
             position="top-right"

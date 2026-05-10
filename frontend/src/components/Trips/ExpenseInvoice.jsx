@@ -112,10 +112,10 @@ const ExpenseInvoice = () => {
               }}></div>
               
               <div className="insights-stats">
-                <p>Total Budget: ${budgetStats.totalBudget}</p>
-                <p>total spent: ${budgetStats.totalSpent}</p>
+                <p>Total Budget: ₹{budgetStats.totalBudget.toLocaleString('en-IN')}</p>
+                <p>Total Spent: ₹{budgetStats.totalSpent.toLocaleString('en-IN')}</p>
                 <p style={{ color: budgetStats.remaining < 0 ? '#ef4444' : '#10b981' }}>
-                  Remaining: ${budgetStats.remaining}
+                  Remaining: ₹{budgetStats.remaining.toLocaleString('en-IN')}
                 </p>
               </div>
             </div>
@@ -145,8 +145,8 @@ const ExpenseInvoice = () => {
                   <td>{item.category}</td>
                   <td>{item.description}</td>
                   <td>{item.qty}</td>
-                  <td>${item.unitCost}</td>
-                  <td>${item.amount}</td>
+                  <td>₹{item.unitCost.toLocaleString('en-IN')}</td>
+                  <td>₹{item.amount.toLocaleString('en-IN')}</td>
                 </tr>
               ))}
               {/* Empty rows to match wireframe visual */}
@@ -158,22 +158,22 @@ const ExpenseInvoice = () => {
               <tr>
                 <td colSpan="4" className="no-border-bottom"></td>
                 <td className="summary-label">Subtotal</td>
-                <td className="summary-value">${subtotal}</td>
+                <td className="summary-value">₹{subtotal.toLocaleString('en-IN')}</td>
               </tr>
               <tr>
                 <td colSpan="4" className="no-border-bottom"></td>
                 <td className="summary-label">tax(5%)</td>
-                <td className="summary-value">${tax}</td>
+                <td className="summary-value">₹{tax.toLocaleString('en-IN')}</td>
               </tr>
               <tr>
                 <td colSpan="4" className="no-border-bottom border-bottom-thick"></td>
                 <td className="summary-label border-bottom-thick">Discount</td>
-                <td className="summary-value border-bottom-thick">${discount}</td>
+                <td className="summary-value border-bottom-thick">₹{discount.toLocaleString('en-IN')}</td>
               </tr>
               <tr>
                 <td colSpan="4" className="no-border-bottom"></td>
                 <td className="summary-label grand-total">Grand Total</td>
-                <td className="summary-value grand-total">${grandTotal}</td>
+                <td className="summary-value grand-total">₹{grandTotal.toLocaleString('en-IN')}</td>
               </tr>
             </tfoot>
           </table>

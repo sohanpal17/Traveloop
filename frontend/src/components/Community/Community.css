@@ -1,0 +1,219 @@
+.cm-container {
+  min-height: 100vh;
+  position: relative;
+  overflow-y: auto;
+  background-color: #2E3773;
+}
+
+.cm-background {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  background-image: url('../../assets/pro_travel_bg.png');
+  background-repeat: repeat;
+  background-size: 800px;
+  opacity: 0.3;
+  animation: panPattern 120s linear infinite;
+  pointer-events: none;
+}
+
+.cm-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* ─── Top Bar ─── */
+.cm-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 24px;
+}
+.cm-logo {
+  display: flex; align-items: center; gap: 10px;
+  color: white; cursor: pointer; font-size: 20px; font-weight: 700;
+}
+.cm-logo svg { width: 28px; height: 28px; }
+.cm-profile-icon {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center; color: white;
+}
+.cm-profile-icon svg { width: 20px; height: 20px; }
+
+/* ─── Search Bar ─── */
+.cm-search-bar {
+  background: rgba(255,255,255,0.96);
+  border-radius: 14px; padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+  flex-wrap: wrap;
+}
+.cm-search-input-wrap {
+  flex: 1; min-width: 200px;
+  display: flex; align-items: center; gap: 10px;
+  background: #f1f5f9; border-radius: 10px; padding: 10px 14px;
+}
+.cm-search-icon { width: 18px; height: 18px; color: #94a3b8; flex-shrink: 0; }
+.cm-search-input {
+  border: none; background: transparent; font-size: 15px;
+  color: #1e293b; width: 100%; outline: none; font-family: inherit;
+}
+.cm-search-input::placeholder { color: #94a3b8; }
+.cm-clear-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; }
+.cm-controls { display: flex; gap: 8px; flex-shrink: 0; }
+.cm-control-btn {
+  background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600; color: #475569;
+  cursor: pointer; transition: all 0.2s; font-family: inherit;
+}
+.cm-control-btn:hover, .cm-control-btn.active {
+  background: #2E3773; color: white; border-color: #2E3773;
+}
+
+/* ─── Filter Panel ─── */
+.cm-filter-panel {
+  background: rgba(255,255,255,0.96); border-radius: 12px;
+  padding: 18px 22px; margin-top: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  animation: cmSlideDown 0.2s ease;
+}
+@keyframes cmSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.cm-filter-group { display: flex; flex-direction: column; gap: 6px; }
+.cm-filter-group label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+.cm-filter-select {
+  padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+  font-size: 14px; color: #1e293b; font-family: inherit; cursor: pointer;
+}
+.cm-filter-select:focus { outline: none; border-color: #7DD5E8; }
+
+/* ─── Section Header ─── */
+.cm-section-header {
+  margin: 28px 0 8px; color: white;
+}
+.cm-section-header h2 { margin: 0; font-size: 24px; font-weight: 700; }
+.cm-section-header p { margin: 4px 0 0; color: rgba(255,255,255,0.6); font-size: 14px; }
+
+/* ─── Description Card (beside posts) ─── */
+.cm-description-card {
+  background: rgba(255,255,255,0.96);
+  border-radius: 14px; padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-left: 4px solid #7DD5E8;
+}
+.cm-description-card h3 {
+  margin: 0 0 8px; font-size: 16px; font-weight: 700; color: #2E3773;
+}
+.cm-description-card p {
+  margin: 0; font-size: 14px; color: #64748b; line-height: 1.6;
+}
+
+/* ─── Posts Layout ─── */
+.cm-posts-list {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ─── Post Card (matching wireframe: circle + card) ─── */
+.cm-post-card {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+
+.cm-post-avatar {
+  width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 16px; font-weight: 700;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.cm-post-body {
+  flex: 1;
+  background: rgba(255,255,255,0.96);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.08);
+  border: 2px solid transparent;
+  transition: all 0.25s ease;
+}
+.cm-post-body:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  border-color: rgba(125,213,232,0.3);
+}
+
+/* Cover image */
+.cm-post-cover { height: 180px; overflow: hidden; }
+.cm-post-cover img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.cm-post-body:hover .cm-post-cover img { transform: scale(1.05); }
+
+/* User info row */
+.cm-post-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px 0; flex-wrap: wrap;
+}
+.cm-post-username { font-size: 14px; font-weight: 700; color: #2E3773; }
+.cm-post-location { font-size: 12px; color: #94a3b8; }
+.cm-post-date { font-size: 12px; color: #cbd5e1; margin-left: auto; }
+
+/* Trip info */
+.cm-post-title {
+  margin: 10px 20px 6px; font-size: 18px; font-weight: 700; color: #1e293b;
+}
+.cm-post-desc {
+  margin: 0 20px 12px; font-size: 14px; color: #64748b; line-height: 1.5;
+}
+
+/* Tags */
+.cm-post-tags {
+  display: flex; gap: 8px; flex-wrap: wrap; padding: 0 20px; margin-bottom: 10px;
+}
+.cm-tag {
+  padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.cm-tag-stop { background: #ede9fe; color: #7c3aed; }
+.cm-tag-activity { background: #ecfdf5; color: #059669; }
+
+/* Meta */
+.cm-post-meta {
+  display: flex; gap: 16px; padding: 0 20px; margin-bottom: 12px;
+  font-size: 13px; color: #94a3b8;
+}
+
+/* Actions */
+.cm-post-actions {
+  display: flex; gap: 0; border-top: 1px solid #f1f5f9;
+}
+.cm-action-btn {
+  flex: 1; padding: 12px; border: none; background: transparent;
+  font-size: 14px; font-weight: 600; color: #94a3b8; cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
+}
+.cm-action-btn:hover { background: #f8fafc; color: #2E3773; }
+.cm-action-btn.liked { color: #ef4444; }
+
+/* Empty state */
+.cm-empty-state {
+  text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.6);
+}
+.cm-empty-state p { font-size: 18px; font-weight: 600; }
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .cm-search-bar { flex-direction: column; }
+  .cm-controls { width: 100%; justify-content: space-between; }
+  .cm-post-card { flex-direction: column; }
+  .cm-post-avatar { align-self: flex-start; }
+  .cm-post-cover { height: 140px; }
+}

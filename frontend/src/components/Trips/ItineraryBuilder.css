@@ -61,183 +61,189 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-.stops-list {
+.sections-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   margin-bottom: 24px;
 }
 
-.stop-card {
+.section-card {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s ease;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(125, 213, 232, 0.2);
 }
 
-.stop-card:hover {
-  transform: translateX(2px);
-}
-
-.stop-header {
+.section-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  gap: 15px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-.stop-inputs {
+.section-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.delete-small {
+  width: 28px;
+  height: 28px;
+  padding: 0;
   display: flex;
-  flex: 1;
-  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  background: #fee2e2;
+  border: none;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.delete-small:hover {
+  background: #fecaca;
+}
+
+.section-description {
+  margin: 0 0 14px 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.section-inputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1;
 }
 
 .input-group label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
-.itinerary-input {
-  padding: 10px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 15px;
-  color: #1e293b;
-  transition: all 0.2s;
-}
-
-.itinerary-input:focus {
-  outline: none;
-  border-color: #7DD5E8;
-  box-shadow: 0 0 0 3px rgba(125, 213, 232, 0.1);
-}
-
-.stop-controls {
+.date-range-inputs {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.icon-btn {
-  background: #f1f5f9;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  cursor: pointer;
+.section-input {
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1e293b;
   transition: all 0.2s;
-  font-weight: bold;
-}
-
-.icon-btn:hover:not(:disabled) {
-  background: #e2e8f0;
-  color: #2E3773;
-}
-
-.icon-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.icon-btn.delete:hover:not(:disabled) {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.activities-section {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 15px;
-  border: 1px solid #f1f5f9;
-}
-
-.activities-section h4 {
-  margin: 0 0 12px 0;
-  color: #334155;
-  font-size: 15px;
-}
-
-.activity-item {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.activity-item .itinerary-input {
   flex: 1;
 }
 
-.add-activity-btn {
-  background: none;
-  border: none;
-  color: #0284c7;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.date-range-inputs .section-input {
+  flex: 1.2;
 }
 
-.add-activity-btn:hover {
-  text-decoration: underline;
+.date-sep {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.btn-add-stop {
+.section-input:focus {
+  outline: none;
+  border-color: #7DD5E8;
+  box-shadow: 0 0 0 2px rgba(125, 213, 232, 0.1);
+}
+
+.notes-section {
+  margin-top: 12px;
+}
+
+.btn-add-section {
   background: rgba(255, 255, 255, 0.1);
   color: white;
-  border: 1px dashed rgba(255, 255, 255, 0.4);
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 16px;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
   transition: all 0.3s;
+  margin-bottom: 20px;
 }
 
-.btn-add-stop:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: white;
+.btn-add-section:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.itinerary-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-save-itinerary {
   background: linear-gradient(135deg, #7DD5E8 0%, #4A90E2 100%);
   color: #fff;
   border: none;
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-size: 16px;
+  padding: 12px 32px;
+  border-radius: 10px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(125, 213, 232, 0.3);
   transition: all 0.3s ease;
-  width: 100%;
-  margin-top: 20px;
 }
 
-.btn-save-itinerary:hover {
+.btn-save-itinerary:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(125, 213, 232, 0.4);
+}
+
+.btn-save-itinerary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 @media (max-width: 640px) {

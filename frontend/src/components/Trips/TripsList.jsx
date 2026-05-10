@@ -88,11 +88,14 @@ const TripsList = () => {
       <div className="trips-card">
         {/* Top Navbar */}
         <header className="trips-topbar">
-          <div className="brand-row" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          <div className="brand-row" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
             <span className="brand-mark"></span>
             <span className="brand-name">Traveloop</span>
           </div>
-          <button className="profile-badge">U</button>
+          <div className="topbar-actions">
+            <button className="topbar-link" onClick={() => navigate('/profile')}>My Profile</button>
+            <button className="profile-badge">U</button>
+          </div>
         </header>
 
         {/* Toolbar */}

@@ -11,7 +11,7 @@ const SharedItinerary = () => {
     title: 'Summer in Europe 2026',
     creator: 'Alex Wanderer',
     cover_photo: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=80',
-    total_estimated_cost: 1500,
+    total_estimated_cost: 125000,
     days: 7,
     stops: 3
   };
@@ -69,7 +69,7 @@ const SharedItinerary = () => {
                 <span className="stat-label">Cities</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">${sharedTrip.total_estimated_cost}</span>
+                <span className="stat-value">₹{sharedTrip.total_estimated_cost.toLocaleString('en-IN')}</span>
                 <span className="stat-label">Estimated</span>
               </div>
             </div>
@@ -120,7 +120,7 @@ const SharedItinerary = () => {
                       )}
 
                       <div className="expense-card">
-                        <h3>${activity.estimated_cost}</h3>
+                        <h3>₹{activity.estimated_cost.toLocaleString('en-IN')}</h3>
                       </div>
 
                     </div>

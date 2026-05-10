@@ -1,0 +1,586 @@
+.trip-details-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: #2E3773;
+  padding: 20px;
+}
+
+.trip-details-background {
+  position: fixed;
+  inset: 0;
+  background-image: url('../../assets/pro_travel_bg.png');
+  background-repeat: repeat;
+  background-size: 800px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.trip-details-card {
+  position: relative;
+  z-index: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(41, 37, 36, 0.14);
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(68, 63, 58, 0.14);
+  backdrop-filter: blur(14px);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.trip-details-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(46, 55, 115, 0.1);
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #2E3773;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.back-button:hover {
+  background: rgba(46, 55, 115, 0.1);
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7DD5E8 0%, #4A90E2 100%);
+}
+
+.brand-name {
+  font-weight: 700;
+  color: #2E3773;
+  font-size: 16px;
+}
+
+.profile-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7DD5E8 0%, #4A90E2 100%);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Trip Header */
+.trip-header {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+}
+
+.trip-header-cover {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+}
+
+.trip-header-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+
+.trip-header-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 40px 24px 24px;
+  color: white;
+}
+
+.trip-header-content h1 {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.trip-header-content p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.trip-meta {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+}
+
+/* Tab Navigation */
+.trip-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(46, 55, 115, 0.1);
+  background: white;
+  overflow-x: auto;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.tab-button:hover {
+  color: #2E3773;
+}
+
+.tab-button.active {
+  color: #2E3773;
+  border-bottom-color: #4A90E2;
+}
+
+/* Tab Content */
+.tab-content {
+  padding: 32px 24px;
+  min-height: 400px;
+}
+
+.tab-content h2 {
+  margin: 0 0 24px 0;
+  color: #2E3773;
+  font-size: 22px;
+}
+
+/* Itinerary Section */
+.itinerary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stop-card {
+  border: 1px solid rgba(46, 55, 115, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  background: rgba(46, 55, 115, 0.02);
+  transition: all 0.3s;
+}
+
+.stop-card:hover {
+  box-shadow: 0 4px 12px rgba(46, 55, 115, 0.1);
+}
+
+.stop-header {
+  margin-bottom: 16px;
+}
+
+.stop-header h3 {
+  margin: 0 0 4px 0;
+  color: #2E3773;
+  font-size: 18px;
+}
+
+.stop-header p {
+  margin: 0;
+  color: #999;
+  font-size: 12px;
+}
+
+.activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.activity-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px 80px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #4A90E2;
+  font-size: 13px;
+}
+
+.activity-category {
+  color: #7DD5E8;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.activity-title {
+  color: #2E3773;
+  font-weight: 500;
+}
+
+.activity-time {
+  text-align: center;
+  color: #999;
+}
+
+.activity-cost {
+  text-align: right;
+  color: #2E3773;
+  font-weight: 600;
+}
+
+/* Notes Section */
+.notes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.notes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.note-card {
+  border: 1px solid rgba(46, 55, 115, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  background: rgba(46, 55, 115, 0.02);
+  transition: all 0.3s;
+}
+
+.note-card:hover {
+  box-shadow: 0 4px 12px rgba(46, 55, 115, 0.1);
+}
+
+.note-card h3 {
+  margin: 0 0 8px 0;
+  color: #2E3773;
+  font-size: 15px;
+}
+
+.note-card p {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.note-card small {
+  color: #999;
+  font-size: 11px;
+}
+
+/* Expenses Section */
+.expenses-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  background: linear-gradient(135deg, #7DD5E8 0%, #4A90E2 100%);
+  color: white;
+  border-radius: 12px;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.summary-row strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.expenses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expense-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(46, 55, 115, 0.2);
+  border-radius: 12px;
+  background: white;
+  transition: all 0.3s;
+}
+
+.expense-row:hover {
+  box-shadow: 0 4px 12px rgba(46, 55, 115, 0.1);
+}
+
+.expense-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.expense-info strong {
+  color: #2E3773;
+  font-size: 14px;
+}
+
+.expense-info small {
+  color: #666;
+  font-size: 12px;
+}
+
+.expense-info tiny {
+  color: #999;
+  font-size: 11px;
+}
+
+.expense-amount {
+  color: #2E3773;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Packing Section */
+.packing-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.packing-progress {
+  background: rgba(46, 55, 115, 0.02);
+  border: 1px solid rgba(46, 55, 115, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(46, 55, 115, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7DD5E8 0%, #4A90E2 100%);
+  transition: width 0.3s;
+}
+
+.packing-progress p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.packing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.packing-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(46, 55, 115, 0.2);
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s;
+}
+
+.packing-item:hover {
+  background: rgba(46, 55, 115, 0.02);
+}
+
+.packing-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #4A90E2;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.item-name {
+  color: #2E3773;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.item-category {
+  color: #999;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Settings Section */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-option {
+  padding: 16px;
+  border: 1px solid rgba(46, 55, 115, 0.2);
+  border-radius: 12px;
+  background: white;
+}
+
+.settings-option label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #2E3773;
+  font-weight: 500;
+}
+
+.settings-option input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #4A90E2;
+}
+
+.settings-option small {
+  display: block;
+  margin-top: 8px;
+  color: #999;
+  font-size: 12px;
+  margin-left: 32px;
+}
+
+/* Buttons */
+.btn-add,
+.btn-primary,
+.btn-edit-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-add,
+.btn-primary,
+.btn-edit-btn {
+  background: linear-gradient(135deg, #7DD5E8 0%, #4A90E2 100%);
+  color: white;
+}
+
+.btn-add:hover,
+.btn-primary:hover,
+.btn-edit-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #E74C3C;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-danger:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #2E3773;
+}
+
+.spinner-large {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .trip-header-content h1 {
+    font-size: 24px;
+  }
+
+  .activity-item {
+    grid-template-columns: 80px 1fr;
+    gap: 8px;
+  }
+
+  .activity-time,
+  .activity-cost {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+
+  .trip-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .notes-list {
+    grid-template-columns: 1fr;
+  }
+}
