@@ -8,8 +8,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const recentTrips = [
-    { id: 1, destination: 'Paris, France', dates: 'Oct 15 - Oct 22, 2026', status: 'Upcoming' },
-    { id: 2, destination: 'Tokyo, Japan', dates: 'Dec 01 - Dec 14, 2026', status: 'Planning' },
+    { id: 1, title: 'Paris, France', start_date: '2026-10-15', end_date: '2026-10-22', is_public: false },
+    { id: 2, title: 'Tokyo, Japan', start_date: '2026-12-01', end_date: '2026-12-14', is_public: true },
   ];
 
   const popularCities = [
@@ -28,7 +28,7 @@ const Dashboard = () => {
             <h1>Welcome back, {userData?.displayName || 'Traveler'}!</h1>
             <p>Ready for your next adventure?</p>
           </div>
-          <button className="plan-trip-btn" onClick={() => navigate('/plan')}>
+          <button className="plan-trip-btn" onClick={() => navigate('/create-trip')}>
             + Plan New Trip
           </button>
         </header>
@@ -41,10 +41,10 @@ const Dashboard = () => {
                 {recentTrips.map(trip => (
                   <div key={trip.id} className="trip-card">
                     <div className="trip-info">
-                      <h3>{trip.destination}</h3>
-                      <p>{trip.dates}</p>
+                      <h3>{trip.title}</h3>
+                      <p>{trip.start_date} to {trip.end_date}</p>
                     </div>
-                    <span className="trip-status">{trip.status}</span>
+                    <span className="trip-status">{trip.is_public ? 'Public' : 'Private'}</span>
                   </div>
                 ))}
               </div>

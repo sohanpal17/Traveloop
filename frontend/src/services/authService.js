@@ -6,114 +6,129 @@ import {
   signOut,
   sendPasswordResetEmail,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  updateProfile
 } from 'firebase/auth';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
+// Helper: try to sync with backend, but don't fail if backend is down
+const syncWithBackend = async (endpoint, payload) => {
+  try {
+    const response = await axios.post(`${API_URL}${endpoint}`, payload);
+    return response.data.user;
+  } catch (error) {
+    console.warn('Backend sync skipped (server may be offline):', error.message);
+    return null;
+  }
+};
+
 const authService = {
   register: async (email, password, displayName) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+    // Step 1: Create user in Firebase (this is the source of truth)
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-      const firebaseToken = await user.getIdToken();
+    // Update display name in Firebase profile
+    await updateProfile(user, { displayName });
 
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        firebaseToken,
+    // Step 2: Try to sync with backend (non-blocking)
+    const firebaseToken = await user.getIdToken();
+    const backendUser = await syncWithBackend('/auth/register', {
+      firebaseToken,
+      email: user.email,
+      displayName: displayName || 'Traveler',
+      photoUrl: user.photoURL
+    });
+
+    return {
+      firebaseUser: user,
+      userData: backendUser || {
         email: user.email,
         displayName: displayName || 'Traveler',
         photoUrl: user.photoURL
-      });
-
-      return {
-        firebaseUser: user,
-        userData: response.data.user
-      };
-    } catch (error) {
-      throw error;
-    }
+      }
+    };
   },
 
   login: async (email, password) => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+    // Step 1: Sign in with Firebase (this is the source of truth)
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-      const firebaseToken = await user.getIdToken();
+    // Step 2: Try to sync with backend (non-blocking)
+    const firebaseToken = await user.getIdToken();
+    const backendUser = await syncWithBackend('/auth/login', {
+      firebaseToken,
+      email: user.email,
+      displayName: user.displayName,
+      photoUrl: user.photoURL
+    });
 
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        firebaseToken,
+    return {
+      firebaseUser: user,
+      userData: backendUser || {
         email: user.email,
-        displayName: user.displayName,
+        displayName: user.displayName || 'Traveler',
         photoUrl: user.photoURL
-      });
-
-      return {
-        firebaseUser: user,
-        userData: response.data.user
-      };
-    } catch (error) {
-      throw error;
-    }
+      }
+    };
   },
 
   loginWithGoogle: async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const user = userCredential.user;
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
 
-      const firebaseToken = await user.getIdToken();
+    // Try to sync with backend (non-blocking)
+    const firebaseToken = await user.getIdToken();
+    const backendUser = await syncWithBackend('/auth/login', {
+      firebaseToken,
+      email: user.email,
+      displayName: user.displayName,
+      photoUrl: user.photoURL
+    });
 
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        firebaseToken,
+    return {
+      firebaseUser: user,
+      userData: backendUser || {
         email: user.email,
-        displayName: user.displayName,
+        displayName: user.displayName || 'Traveler',
         photoUrl: user.photoURL
-      });
-
-      return {
-        firebaseUser: user,
-        userData: response.data.user
-      };
-    } catch (error) {
-      throw error;
-    }
+      }
+    };
   },
 
   logout: async () => {
-    try {
-      await signOut(auth);
-      localStorage.removeItem('user');
-    } catch (error) {
-      throw error;
-    }
+    await signOut(auth);
+    localStorage.removeItem('user');
   },
 
   resetPassword: async (email) => {
-    try {
-      await sendPasswordResetEmail(auth, email);
-    } catch (error) {
-      throw error;
-    }
+    await sendPasswordResetEmail(auth, email);
   },
 
   getCurrentUser: async () => {
-    try {
-      const user = auth.currentUser;
-      if (!user) return null;
+    const user = auth.currentUser;
+    if (!user) return null;
 
+    // Try backend first
+    try {
       const token = await user.getIdToken();
       const response = await axios.get(`${API_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-
       return response.data.user;
     } catch (error) {
-      throw error;
+      // Backend unavailable — fall back to Firebase user data
+      console.warn('Backend unavailable, using Firebase user data');
+      return {
+        email: user.email,
+        displayName: user.displayName || 'Traveler',
+        photoUrl: user.photoURL
+      };
     }
   }
 };

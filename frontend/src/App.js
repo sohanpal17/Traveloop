@@ -7,12 +7,23 @@ import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
 import Dashboard from './components/Dashboard/Dashboard';
 import TripsList from './components/Trips/TripsList';
+import CreateTrip from './components/Trips/CreateTrip';
 import ItineraryBuilder from './components/Trips/ItineraryBuilder';
 import './App.css';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  return children;
+  const { currentUser, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="spinner-large"></div>
+      </div>
+    );
+  }
+
+  return currentUser ? children : <Navigate to="/login" />;
 };
 
 function App() {
@@ -31,21 +42,29 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route 
-              path="/trips" 
+            <Route
+              path="/trips"
               element={
                 <ProtectedRoute>
                   <TripsList />
                 </ProtectedRoute>
-              } 
+              }
             />
-            <Route 
-              path="/plan" 
+            <Route
+              path="/create-trip"
+              element={
+                <ProtectedRoute>
+                  <CreateTrip />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/plan"
               element={
                 <ProtectedRoute>
                   <ItineraryBuilder />
                 </ProtectedRoute>
-              } 
+              }
             />
             <Route path="/" element={<Navigate to="/login" />} />
           </Routes>

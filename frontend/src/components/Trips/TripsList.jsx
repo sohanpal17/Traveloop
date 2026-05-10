@@ -5,28 +5,31 @@ import './TripsList.css';
 const TripsList = () => {
   const navigate = useNavigate();
   
-  // Mock data for trips
+  // Mock data for trips mapping to tripModel.js
   const [trips, setTrips] = useState([
     {
       id: 1,
-      name: 'European Summer Backpacking',
-      dateRange: 'Jun 10, 2026 - Jul 15, 2026',
-      destinations: 5,
-      status: 'Upcoming'
+      title: 'European Summer Backpacking',
+      start_date: '2026-06-10',
+      end_date: '2026-07-15',
+      stop_count: 5,
+      is_public: true
     },
     {
       id: 2,
-      name: 'Tokyo Tech & Culture',
-      dateRange: 'Oct 05, 2026 - Oct 19, 2026',
-      destinations: 2,
-      status: 'Planning'
+      title: 'Tokyo Tech & Culture',
+      start_date: '2026-10-05',
+      end_date: '2026-10-19',
+      stop_count: 2,
+      is_public: false
     },
     {
       id: 3,
-      name: 'Bali Retreat',
-      dateRange: 'Jan 12, 2025 - Jan 22, 2025',
-      destinations: 1,
-      status: 'Completed'
+      title: 'Bali Retreat',
+      start_date: '2025-01-12',
+      end_date: '2025-01-22',
+      stop_count: 1,
+      is_public: true
     }
   ]);
 
@@ -46,7 +49,7 @@ const TripsList = () => {
             <h1>My Trips</h1>
             <p>Manage and access all your planned adventures.</p>
           </div>
-          <button className="plan-trip-btn" onClick={() => navigate('/plan')}>
+          <button className="plan-trip-btn" onClick={() => navigate('/create-trip')}>
             + Plan New Trip
           </button>
         </header>
@@ -60,7 +63,7 @@ const TripsList = () => {
             trips.map(trip => (
               <div key={trip.id} className="full-trip-card">
                 <div className="trip-details">
-                  <h2>{trip.name}</h2>
+                  <h2>{trip.title}</h2>
                   <div className="trip-meta">
                     <div className="meta-item">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -69,18 +72,18 @@ const TripsList = () => {
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                         <line x1="3" y1="10" x2="21" y2="10"></line>
                       </svg>
-                      {trip.dateRange}
+                      {trip.start_date} to {trip.end_date}
                     </div>
                     <div className="meta-item">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                         <circle cx="12" cy="10" r="3"></circle>
                       </svg>
-                      {trip.destinations} Destination{trip.destinations > 1 ? 's' : ''}
+                      {trip.stop_count} Stop{trip.stop_count > 1 ? 's' : ''}
                     </div>
                     <div className="meta-item">
                       <span className="trip-status" style={{ color: '#2E3773', fontWeight: '600' }}>
-                        • {trip.status}
+                        • {trip.is_public ? 'Public' : 'Private'}
                       </span>
                     </div>
                   </div>
