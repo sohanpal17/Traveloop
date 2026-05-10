@@ -9,7 +9,7 @@ import './App.css';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -19,18 +19,24 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  return currentUser ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/login" replace />;
 };
 
 // Temporary Dashboard Component
 const Dashboard = () => {
-  const { userData } = useAuth();
-  
+  const { user, logout } = useAuth();
+
   return (
     <div style={{ padding: '40px', textAlign: 'center' }}>
       <h1>Welcome to Traveloop Dashboard!</h1>
-      <p>Hello, {userData?.displayName || 'Traveler'}!</p>
+      <p>Hello, {user?.name || 'Traveler'}!</p>
       <p>Your dashboard will be implemented in the next phase.</p>
+      <button
+        onClick={logout}
+        style={{ marginTop: '20px', padding: '10px 24px', cursor: 'pointer' }}
+      >
+        Logout
+      </button>
     </div>
   );
 };
@@ -43,13 +49,13 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
             <Route path="/" element={<Navigate to="/login" />} />
           </Routes>

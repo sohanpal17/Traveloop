@@ -1,71 +1,118 @@
-const admin = require('../config/firebase');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 
-const authController = {
-  // Register/Login user
-  registerOrLogin: async (req, res) => {
-    try {
-      const { firebaseToken, email, displayName, photoUrl } = req.body;
+const generateToken = (userId) => {
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+};
 
-      if (!firebaseToken) {
+const authController = {
+  register: async (req, res) => {
+    try {
+      const { name, email, password } = req.body;
+
+      if (!name || !email || !password) {
         return res.status(400).json({
           success: false,
-          message: 'Firebase token is required'
+          message: 'Name, email and password are required'
         });
       }
 
-      // Verify Firebase token
-      const decodedToken = await admin.auth().verifyIdToken(firebaseToken);
-      const firebaseUid = decodedToken.uid;
+      const existingUser = await UserModel.findByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already registered'
+        });
+      }
 
-      // Create or update user in PostgreSQL
-      const user = await UserModel.createOrUpdateUser(
-        firebaseUid,
-        email || decodedToken.email,
-        displayName || decodedToken.name || 'Traveler',
-        photoUrl || decodedToken.picture || null
-      );
+      const passwordHash = await bcrypt.hash(password, 10);
+      const user = await UserModel.createUser(name, email, passwordHash);
+      const token = generateToken(user.id);
 
-      return res.status(200).json({
+      return res.status(201).json({
         success: true,
-        message: 'Authentication successful',
+        message: 'Account created successfully',
+        token,
         user: {
           id: user.id,
-          firebaseUid: user.firebase_uid,
+          name: user.name,
           email: user.email,
-          displayName: user.display_name,
-          photoUrl: user.photo_url,
           createdAt: user.created_at
         }
       });
     } catch (error) {
-      console.error('Auth error:', error);
+      console.error('Register error:', error);
       return res.status(500).json({
         success: false,
-        message: 'Authentication failed',
+        message: 'Registration failed',
         error: error.message
       });
     }
   },
 
-  // Get current user
-  getCurrentUser: async (req, res) => {
+  login: async (req, res) => {
     try {
-      const user = req.user;
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email and password are required'
+        });
+      }
+
+      const user = await UserModel.findByEmail(email);
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password'
+        });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password_hash);
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid email or password'
+        });
+      }
+
+      const token = generateToken(user.id);
 
       return res.status(200).json({
         success: true,
+        message: 'Login successful',
+        token,
         user: {
           id: user.id,
-          firebaseUid: user.firebase_uid,
+          name: user.name,
           email: user.email,
-          displayName: user.display_name,
-          photoUrl: user.photo_url,
           createdAt: user.created_at
         }
       });
     } catch (error) {
-      console.error('Get user error:', error);
+      console.error('Login error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Login failed',
+        error: error.message
+      });
+    }
+  },
+
+  getCurrentUser: async (req, res) => {
+    try {
+      const user = await UserModel.findById(req.user.id);
+      return res.status(200).json({
+        success: true,
+        user
+      });
+    } catch (error) {
       return res.status(500).json({
         success: false,
         message: 'Failed to get user',
@@ -74,34 +121,19 @@ const authController = {
     }
   },
 
-  // Update user profile
   updateProfile: async (req, res) => {
     try {
-      const { displayName, photoUrl } = req.body;
-      const firebaseUid = req.user.firebase_uid;
-
-      const updatedUser = await UserModel.updateProfile(
-        firebaseUid,
-        displayName,
-        photoUrl
-      );
-
+      const { name } = req.body;
+      const updated = await UserModel.updateProfile(req.user.id, name);
       return res.status(200).json({
         success: true,
-        message: 'Profile updated successfully',
-        user: {
-          id: updatedUser.id,
-          firebaseUid: updatedUser.firebase_uid,
-          email: updatedUser.email,
-          displayName: updatedUser.display_name,
-          photoUrl: updatedUser.photo_url
-        }
+        message: 'Profile updated',
+        user: updated
       });
     } catch (error) {
-      console.error('Update profile error:', error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to update profile',
+        message: 'Update failed',
         error: error.message
       });
     }

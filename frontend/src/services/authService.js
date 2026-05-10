@@ -1,121 +1,41 @@
-import axios from 'axios';
-import { auth } from '../config/firebase';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  GoogleAuthProvider,
-  signInWithPopup
-} from 'firebase/auth';
-
-const API_URL = process.env.REACT_APP_API_URL;
+import API from './api';
 
 const authService = {
-  register: async (email, password, displayName) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      const firebaseToken = await user.getIdToken();
-
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        firebaseToken,
-        email: user.email,
-        displayName: displayName || 'Traveler',
-        photoUrl: user.photoURL
-      });
-
-      return {
-        firebaseUser: user,
-        userData: response.data.user
-      };
-    } catch (error) {
-      throw error;
-    }
+  // Register with name, email, password — returns { token, user }
+  register: async (name, email, password) => {
+    const response = await API.post('/auth/register', { name, email, password });
+    const { token, user } = response.data;
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    return response.data;
   },
 
+  // Login with email, password — returns { token, user }
   login: async (email, password) => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      const firebaseToken = await user.getIdToken();
-
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        firebaseToken,
-        email: user.email,
-        displayName: user.displayName,
-        photoUrl: user.photoURL
-      });
-
-      return {
-        firebaseUser: user,
-        userData: response.data.user
-      };
-    } catch (error) {
-      throw error;
-    }
+    const response = await API.post('/auth/login', { email, password });
+    const { token, user } = response.data;
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
+    return response.data;
   },
 
-  loginWithGoogle: async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const user = userCredential.user;
-
-      const firebaseToken = await user.getIdToken();
-
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        firebaseToken,
-        email: user.email,
-        displayName: user.displayName,
-        photoUrl: user.photoURL
-      });
-
-      return {
-        firebaseUser: user,
-        userData: response.data.user
-      };
-    } catch (error) {
-      throw error;
-    }
+  // Logout — clear localStorage
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   },
 
-  logout: async () => {
-    try {
-      await signOut(auth);
-      localStorage.removeItem('user');
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  resetPassword: async (email) => {
-    try {
-      await sendPasswordResetEmail(auth, email);
-    } catch (error) {
-      throw error;
-    }
-  },
-
+  // Get current user from backend using stored JWT
   getCurrentUser: async () => {
-    try {
-      const user = auth.currentUser;
-      if (!user) return null;
+    const response = await API.get('/auth/me');
+    return response.data.user;
+  },
 
-      const token = await user.getIdToken();
-      const response = await axios.get(`${API_URL}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+  // Get token from localStorage
+  getToken: () => localStorage.getItem('token'),
 
-      return response.data.user;
-    } catch (error) {
-      throw error;
-    }
-  }
+  // Check if user is authenticated
+  isAuthenticated: () => !!localStorage.getItem('token'),
 };
 
 export default authService;

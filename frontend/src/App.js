@@ -9,19 +9,18 @@ import './App.css';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+  const { user, loading } = useAuth(); // Ensure 'loading' is correctly exported from Context
 
+  // 1. If still checking the token/session, show NOTHING or a spinner
+  // This prevents the instant redirect to login before the user state is set
   if (loading) {
-    return (
-      <div className="loading-screen">
-        <div className="spinner-large"></div>
-      </div>
-    );
+    return <div className="loading-spinner">Verifying session...</div>;
   }
 
-  return currentUser ? children : <Navigate to="/login" />;
+  // 2. Only redirect if we are CERTAIN there is no user and loading is finished
+  return user ? children : <Navigate to="/login" replace />;
 };
-
+  
 // Temporary Dashboard Component
 const Dashboard = () => {
   const { userData } = useAuth();

@@ -1,56 +1,57 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { auth } from '../config/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import authService from '../services/authService';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+// 1. Ensure getMe and other services are imported correctly
+import { getMe, login as loginApi, signup as signupApi } from '../services/api';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      
-      if (user) {
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
         try {
-          const data = await authService.getCurrentUser();
-          setUserData(data);
-          localStorage.setItem('user', JSON.stringify(data));
-        } catch (error) {
-          console.error('Error fetching user data:', error);
+          const res = await getMe();
+          // Ensure this matches your backend response structure (res.data.user)
+          setUser(res.data.user || res.data); 
+        } catch (err) {
+          console.error("Session verification failed", err);
+          localStorage.removeItem('token');
         }
-      } else {
-        setUserData(null);
-        localStorage.removeItem('user');
       }
-      
-      setLoading(false);
-    });
-
-    return unsubscribe;
+      setLoading(false); // CRITICAL: Stop loading once the check is done
+    };
+    initAuth();
   }, []);
 
-  const value = {
-    currentUser,
-    userData,
-    loading,
-    setUserData
+  const login = async (email, password) => {
+    const res = await loginApi({ email, password });
+    if (res.data.token) {
+      localStorage.setItem('token', res.data.token);
+      setUser(res.data.user);
+    }
+    return res.data;
   };
 
+  const register = async (userData) => {
+    const res = await signupApi(userData);
+    return res.data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  // 2. This return was previously "outside" because of a missing closing brace }
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
+      {children}
     </AuthContext.Provider>
   );
 };
+

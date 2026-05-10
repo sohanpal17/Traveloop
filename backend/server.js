@@ -1,41 +1,23 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-
-const authRoutes = require('./routes/authRoutes');
+const pool = require('./config/db');
 
 const app = express();
 
-// Middleware
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth',  require('./routes/authRoutes'));
+app.use('/api/trips', require('./routes/tripRoutes'));
+app.use('/api/trips/:tripId/stops',      require('./routes/stopRoutes'));
+app.use('/api/stops/:stopId/activities', require('./routes/activityRoutes'));
+app.use('/api/trips/:tripId/checklist',  require('./routes/checklistRoutes'));
+app.use('/api/trips/:tripId/notes',      require('./routes/noteRoutes'));
+app.use('/api/public', require('./routes/publicRoutes'));
 
-// Health check
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Traveloop API is running',
-    timestamp: new Date().toISOString()
-  });
-});
+app.get('/', (req, res) => res.send('Traveloop API running'));
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });

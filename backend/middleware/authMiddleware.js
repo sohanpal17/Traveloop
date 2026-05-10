@@ -1,4 +1,4 @@
-const admin = require('../config/firebase');
+const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 
 const authMiddleware = async (req, res, next) => {
@@ -12,28 +12,20 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
-    const token = authHeader.split('Bearer ')[1];
-
-    // Verify Firebase ID token
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    
-    // Get user from database
-    const user = await UserModel.findByFirebaseUid(decodedToken.uid);
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await UserModel.findById(decoded.id);
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
         message: 'User not found'
       });
     }
 
-    // Attach user to request
     req.user = user;
-    req.firebaseUser = decodedToken;
-    
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
     return res.status(401).json({
       success: false,
       message: 'Invalid or expired token'
