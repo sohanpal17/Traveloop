@@ -5,40 +5,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
+import Dashboard from './components/Dashboard.jsx'; // Import the new file
 import './App.css';
 
-// Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="loading-screen">
-        <div className="spinner-large"></div>
-      </div>
-    );
-  }
-
+  if (loading) return <div className="loading-spinner">Verifying session...</div>;
   return user ? children : <Navigate to="/login" replace />;
-};
-
-// Temporary Dashboard Component
-const Dashboard = () => {
-  const { user, logout } = useAuth();
-
-  return (
-    <div style={{ padding: '40px', textAlign: 'center' }}>
-      <h1>Welcome to Traveloop Dashboard!</h1>
-      <p>Hello, {user?.name || 'Traveler'}!</p>
-      <p>Your dashboard will be implemented in the next phase.</p>
-      <button
-        onClick={logout}
-        style={{ marginTop: '20px', padding: '10px 24px', cursor: 'pointer' }}
-      >
-        Logout
-      </button>
-    </div>
-  );
 };
 
 function App() {
@@ -49,28 +22,10 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
+          <ToastContainer position="top-right" autoClose={3000} theme="light" />
         </div>
       </AuthProvider>
     </Router>
