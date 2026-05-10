@@ -24,28 +24,53 @@ const syncWithBackend = async (endpoint, payload) => {
 };
 
 const authService = {
-  register: async (email, password, displayName) => {
+  register: async (email, password, profileData = {}) => {
     // Step 1: Create user in Firebase (this is the source of truth)
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    const {
+      firstName,
+      lastName,
+      displayName,
+      phoneNumber,
+      city,
+      country,
+      additionalInfo,
+      photoUrl
+    } = profileData;
+
+    const resolvedDisplayName = displayName || [firstName, lastName].filter(Boolean).join(' ').trim() || 'Traveler';
+
     // Update display name in Firebase profile
-    await updateProfile(user, { displayName });
+    await updateProfile(user, { displayName: resolvedDisplayName });
 
     // Step 2: Try to sync with backend (non-blocking)
     const firebaseToken = await user.getIdToken();
     const backendUser = await syncWithBackend('/auth/register', {
       firebaseToken,
       email: user.email,
-      displayName: displayName || 'Traveler',
-      photoUrl: user.photoURL
+      firstName: firstName || '',
+      lastName: lastName || '',
+      displayName: resolvedDisplayName,
+      phoneNumber: phoneNumber || '',
+      city: city || '',
+      country: country || '',
+      additionalInfo: additionalInfo || '',
+      photoUrl: photoUrl || user.photoURL || null
     });
 
     return {
       firebaseUser: user,
       userData: backendUser || {
         email: user.email,
-        displayName: displayName || 'Traveler',
+        firstName: firstName || '',
+        lastName: lastName || '',
+        displayName: resolvedDisplayName,
+        phoneNumber: phoneNumber || '',
+        city: city || '',
+        country: country || '',
+        additionalInfo: additionalInfo || '',
         photoUrl: user.photoURL
       }
     };
@@ -102,6 +127,23 @@ const authService = {
   logout: async () => {
     await signOut(auth);
     localStorage.removeItem('user');
+  },
+
+  updateProfile: async (profileData = {}) => {
+    const user = auth.currentUser;
+
+    if (!user) {
+      throw new Error('No authenticated user found');
+    }
+
+    const token = await user.getIdToken();
+    const response = await axios.put(`${API_URL}/auth/profile`, profileData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return response.data.user;
   },
 
   resetPassword: async (email) => {

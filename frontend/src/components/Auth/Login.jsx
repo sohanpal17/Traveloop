@@ -13,6 +13,26 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const getValidationError = () => {
+    if (!formData.email.trim() || !formData.password.trim()) {
+      return 'Please fill in all fields';
+    }
+
+    if (!isValidEmail(formData.email.trim())) {
+      return 'Please enter a valid email address';
+    }
+
+    if (formData.password.trim().length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+
+    return '';
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,15 +43,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      toast.error('Please fill in all fields');
+    const validationError = getValidationError();
+    if (validationError) {
+      toast.error(validationError);
       return;
     }
 
     setLoading(true);
 
     try {
-      await authService.login(formData.email, formData.password);
+      await authService.login(formData.email.trim(), formData.password);
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (error) {
@@ -70,13 +91,20 @@ const Login = () => {
   };
 
   const handleForgotPassword = async () => {
-    if (!formData.email) {
+    const email = formData.email.trim();
+
+    if (!email) {
       toast.error('Please enter your email address');
       return;
     }
 
+    if (!isValidEmail(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
     try {
-      await authService.resetPassword(formData.email);
+      await authService.resetPassword(email);
       toast.success('Password reset email sent! Check your inbox.');
     } catch (error) {
       console.error('Password reset error:', error);

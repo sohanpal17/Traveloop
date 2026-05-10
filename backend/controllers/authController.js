@@ -5,7 +5,18 @@ const authController = {
   // Register/Login user
   registerOrLogin: async (req, res) => {
     try {
-      const { firebaseToken, email, displayName, photoUrl } = req.body;
+      const {
+        firebaseToken,
+        email,
+        displayName,
+        firstName,
+        lastName,
+        phoneNumber,
+        city,
+        country,
+        additionalInfo,
+        photoUrl
+      } = req.body;
 
       if (!firebaseToken) {
         return res.status(400).json({
@@ -22,8 +33,16 @@ const authController = {
       const user = await UserModel.createOrUpdateUser(
         firebaseUid,
         email || decodedToken.email,
-        displayName || decodedToken.name || 'Traveler',
-        photoUrl || decodedToken.picture || null
+        {
+          firstName,
+          lastName,
+          displayName: displayName || decodedToken.name || [firstName, lastName].filter(Boolean).join(' ').trim(),
+          phoneNumber,
+          city,
+          country,
+          additionalInfo,
+          photoUrl: photoUrl || decodedToken.picture || null
+        }
       );
 
       return res.status(200).json({
@@ -33,7 +52,13 @@ const authController = {
           id: user.id,
           firebaseUid: user.firebase_uid,
           email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
           displayName: user.display_name,
+          phoneNumber: user.phone_number,
+          city: user.city,
+          country: user.country,
+          additionalInfo: user.additional_info,
           photoUrl: user.photo_url,
           createdAt: user.created_at
         }
@@ -59,7 +84,13 @@ const authController = {
           id: user.id,
           firebaseUid: user.firebase_uid,
           email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
           displayName: user.display_name,
+          phoneNumber: user.phone_number,
+          city: user.city,
+          country: user.country,
+          additionalInfo: user.additional_info,
           photoUrl: user.photo_url,
           createdAt: user.created_at
         }
@@ -77,13 +108,30 @@ const authController = {
   // Update user profile
   updateProfile: async (req, res) => {
     try {
-      const { displayName, photoUrl } = req.body;
+      const {
+        displayName,
+        firstName,
+        lastName,
+        phoneNumber,
+        city,
+        country,
+        additionalInfo,
+        photoUrl
+      } = req.body;
       const firebaseUid = req.user.firebase_uid;
 
       const updatedUser = await UserModel.updateProfile(
         firebaseUid,
-        displayName,
-        photoUrl
+        {
+          firstName,
+          lastName,
+          displayName,
+          phoneNumber,
+          city,
+          country,
+          additionalInfo,
+          photoUrl
+        }
       );
 
       return res.status(200).json({
@@ -93,7 +141,13 @@ const authController = {
           id: updatedUser.id,
           firebaseUid: updatedUser.firebase_uid,
           email: updatedUser.email,
+          firstName: updatedUser.first_name,
+          lastName: updatedUser.last_name,
           displayName: updatedUser.display_name,
+          phoneNumber: updatedUser.phone_number,
+          city: updatedUser.city,
+          country: updatedUser.country,
+          additionalInfo: updatedUser.additional_info,
           photoUrl: updatedUser.photo_url
         }
       });

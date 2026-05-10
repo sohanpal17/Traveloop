@@ -27,12 +27,28 @@ const createTables = async () => {
       id SERIAL PRIMARY KEY,
       firebase_uid VARCHAR(255) UNIQUE NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
+      first_name VARCHAR(255),
+      last_name VARCHAR(255),
       display_name VARCHAR(255),
+      phone_number VARCHAR(50),
+      city VARCHAR(255),
+      country VARCHAR(255),
+      additional_info TEXT,
       photo_url TEXT,
       language_preference VARCHAR(10) DEFAULT 'en',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+  `;
+
+  const syncUsersColumns = `
+    ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS first_name VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS last_name VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS phone_number VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS city VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS country VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS additional_info TEXT;
   `;
 
   // Trips table
@@ -187,6 +203,7 @@ const createTables = async () => {
 
   try {
     await pool.query(createUsersTable);
+    await pool.query(syncUsersColumns);
     await pool.query(createTripsTable);
     await pool.query(createStopsTable);
     await pool.query(createActivitiesTable);
