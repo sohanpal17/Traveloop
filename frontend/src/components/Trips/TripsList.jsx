@@ -1,122 +1,169 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TripsList.css';
 
 const TripsList = () => {
   const navigate = useNavigate();
-  
-  // Mock data for trips mapping to tripModel.js
-  const [trips, setTrips] = useState([
+
+  // Toolbar state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [groupBy, setGroupBy] = useState('Status');
+  const [filterBy, setFilterBy] = useState('All');
+  const [sortBy, setSortBy] = useState('Date');
+
+  // Dummy data mapping to tripModel.js schema
+  // Schema: id, title, description, start_date, end_date, cover_photo_url, etc.
+  const allTrips = [
     {
       id: 1,
       title: 'European Summer Backpacking',
+      description: 'A 5-city tour across Western Europe focusing on history and food.',
       start_date: '2026-06-10',
       end_date: '2026-07-15',
-      stop_count: 5,
-      is_public: true
+      cover_photo_url: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=800&q=80',
+      status: 'upcoming'
     },
     {
       id: 2,
       title: 'Tokyo Tech & Culture',
+      description: 'Exploring the busy streets of Tokyo and historic temples of Kyoto.',
       start_date: '2026-10-05',
       end_date: '2026-10-19',
-      stop_count: 2,
-      is_public: false
+      cover_photo_url: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
+      status: 'ongoing'
     },
     {
       id: 3,
       title: 'Bali Retreat',
+      description: 'Relaxing 10 days in Bali with yoga, beaches, and surfing.',
       start_date: '2025-01-12',
       end_date: '2025-01-22',
-      stop_count: 1,
-      is_public: true
+      cover_photo_url: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80',
+      status: 'completed'
+    },
+    {
+      id: 4,
+      title: 'Rome Getaway',
+      description: 'Weekend trip to Rome to see the Colosseum and eat pasta.',
+      start_date: '2024-05-10',
+      end_date: '2024-05-14',
+      cover_photo_url: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80',
+      status: 'completed'
     }
-  ]);
+  ];
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this trip?')) {
-      setTrips(trips.filter(trip => trip.id !== id));
-    }
-  };
+  const filteredTrips = useMemo(() => {
+    return allTrips.filter(trip => 
+      trip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      trip.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, allTrips]);
+
+  const ongoingTrips = filteredTrips.filter(t => t.status === 'ongoing');
+  const upcomingTrips = filteredTrips.filter(t => t.status === 'upcoming');
+  const completedTrips = filteredTrips.filter(t => t.status === 'completed');
+
+  const TripCard = ({ trip }) => (
+    <div className="trip-list-card">
+      <div className="trip-list-card__image" style={{ backgroundImage: `url(${trip.cover_photo_url})` }}></div>
+      <div className="trip-list-card__content">
+        <div className="trip-list-card__info">
+          <h3>{trip.title}</h3>
+          <p>{trip.description}</p>
+          <span className="trip-dates">{trip.start_date} to {trip.end_date}</span>
+        </div>
+        <div className="trip-list-card__actions">
+          <button className="plan-fab" onClick={() => navigate(`/trips/${trip.id}`)}>
+            View
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="trips-page-container">
+    <div className="trips-shell">
       <div className="trips-background"></div>
-      
-      <div className="trips-content">
-        <header className="trips-header">
-          <div>
-            <h1>My Trips</h1>
-            <p>Manage and access all your planned adventures.</p>
+
+      <div className="trips-card">
+        {/* Top Navbar */}
+        <header className="trips-topbar">
+          <div className="brand-row" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+            <span className="brand-mark"></span>
+            <span className="brand-name">Traveloop</span>
           </div>
-          <button className="plan-trip-btn" onClick={() => navigate('/create-trip')}>
-            + Plan New Trip
-          </button>
+          <button className="profile-badge">U</button>
         </header>
 
-        <div className="trips-grid">
-          {trips.length === 0 ? (
-            <div className="full-trip-card" style={{ justifyContent: 'center', padding: '40px' }}>
-              <p style={{ color: '#64748b', fontSize: '18px' }}>You haven't planned any trips yet. Let's get started!</p>
-            </div>
-          ) : (
-            trips.map(trip => (
-              <div key={trip.id} className="full-trip-card">
-                <div className="trip-details">
-                  <h2>{trip.title}</h2>
-                  <div className="trip-meta">
-                    <div className="meta-item">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
-                      {trip.start_date} to {trip.end_date}
-                    </div>
-                    <div className="meta-item">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                      {trip.stop_count} Stop{trip.stop_count > 1 ? 's' : ''}
-                    </div>
-                    <div className="meta-item">
-                      <span className="trip-status" style={{ color: '#2E3773', fontWeight: '600' }}>
-                        • {trip.is_public ? 'Public' : 'Private'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+        {/* Toolbar */}
+        <div className="trips-toolbar">
+          <label className="search-input" aria-label="Search">
+            <span className="search-icon" aria-hidden="true">🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search trips ......"
+            />
+          </label>
 
-                <div className="trip-actions">
-                  <button className="action-btn btn-view" onClick={() => navigate(`/trips/${trip.id}`)}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    View
-                  </button>
-                  <button className="action-btn btn-edit" onClick={() => navigate(`/trips/${trip.id}/edit`)}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                    Edit
-                  </button>
-                  <button className="action-btn btn-delete" onClick={() => handleDelete(trip.id)}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                    Delete
-                  </button>
+          <select value={groupBy} onChange={(e) => setGroupBy(e.target.value)} className="toolbar-select">
+            <option value="Status">Group by</option>
+            <option value="Status">Status</option>
+            <option value="Year">Year</option>
+          </select>
+
+          <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)} className="toolbar-select">
+            <option value="All">Filter</option>
+            <option value="All">All</option>
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+          </select>
+
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="toolbar-select">
+            <option value="Date">Sort by...</option>
+            <option value="Date">Date</option>
+            <option value="Name">Name</option>
+          </select>
+        </div>
+
+        {/* Trip Sections */}
+        <div className="trips-sections-wrapper">
+          
+          {ongoingTrips.length > 0 && (
+            <section className="trip-category-section">
+              <h2 className="trip-category-title">Ongoing</h2>
+              <div className="trip-category-list">
+                {ongoingTrips.map(trip => <TripCard key={trip.id} trip={trip} />)}
+              </div>
+            </section>
+          )}
+
+          {upcomingTrips.length > 0 && (
+            <section className="trip-category-section">
+              <h2 className="trip-category-title">Up-coming</h2>
+              <div className="trip-category-list">
+                {upcomingTrips.map(trip => <TripCard key={trip.id} trip={trip} />)}
+              </div>
+            </section>
+          )}
+
+          {completedTrips.length > 0 && (
+            <section className="trip-category-section">
+              <h2 className="trip-category-title">Completed</h2>
+              <div className="trip-category-slider">
+                {/* Simulated left arrow from wireframe */}
+                <button className="slider-arrow">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                
+                <div className="slider-content">
+                  {completedTrips.map(trip => <TripCard key={trip.id} trip={trip} />)}
                 </div>
               </div>
-            ))
+            </section>
           )}
+
         </div>
       </div>
     </div>
